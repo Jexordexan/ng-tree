@@ -100,7 +100,7 @@ module.exports = function (options) {
          */
         {
           test: /\.css$/,
-          use: ['style-loader', 'css-loader'],
+          use: ['style-loader?sourceMap', 'css-loader'],
           include: [helpers.root('src', 'styles')]
         },
 
