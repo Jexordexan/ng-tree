@@ -1,0 +1,50 @@
+tree-root {
+  display: block;
+}
+
+.tree__icon {
+  display: inline-block;
+  font-weight: bold;
+  float: left;
+  width: 17px;
+  height: 17px;
+}
+
+.tree__icon.collapsed,
+.tree__icon.expanded {
+  background-image: url('data:image/svg+xml;utf8,<svg version="1.1" width="17" height="17" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M7 5 L13 10 L7 15" fill="none" stroke="black" stroke-width="2"/></svg>');
+  transition: transform .2s;
+}
+.tree__icon.expanded {
+  transform: rotate(90deg);
+}
+.tree__nodes {
+  padding: 0;
+  margin: 0;
+}
+.tree__nodes.empty {
+  height: 28px;
+  background: rgba(128,128,128,.25);
+}
+.hidden {
+  display: none
+}
+.tree__node-item {
+  padding: 5px;
+}
+.tree__node-item:hover {
+  background: rgba(128,128,128,.1);
+}
+.tree__node-item.selected {
+  background: rgba(128,128,128,.75);
+  color: #FFF;
+}
+.tree__node-item.match {
+  background: gold;
+}
+.tree__node-item.selected + .tree__nodes {
+  background: rgba(128,128,128,.25);
+}
+.placeInside {
+  outline: 1px solid #29F;
+}
