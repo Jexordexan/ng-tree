@@ -19,7 +19,7 @@ export interface IOptions {
     template: `
       <ul class="tree__nodes"
           [class.empty]="!tree.hasNodes()"
-          [class.placeInside]="isDropTarget"
+          [class.placeInside]="tree.isDropTarget"
           (mouseover)="onMouseOver($event)">
         <tree-node *ngFor="let node of tree.root"
                     [treeNode]="node">
@@ -29,13 +29,12 @@ export interface IOptions {
 })
 
 export class TreeComponent implements OnInit, OnChanges {
-  @Input() treeData: TreeNode[];
+  @Input() tree: Tree = new Tree();
   @Input() filter: string = '';
   @Input() options: IOptions;
   @ContentChild('nodeTemplate') nodeTemplate: TemplateRef<ITreeNodeTemplate>;
 
   public elem: HTMLElement;
-  public tree: Tree;
   private anchorNode: TreeNode = null;
   private selectedNodes: TreeNode[] = [];
   private expandedNodes: TreeNode[] = [];
@@ -51,10 +50,6 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    if (!this.tree) {
-      this.tree = new Tree(this.treeData);
-    }
-
     if (this.options) {
       if (typeof this.options.allowDrag === 'function') {
         this.allowDrag = this.options.allowDrag;
@@ -137,8 +132,8 @@ export class TreeComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['treeData']) {
-      this.onTreeDataChanges(changes['treeData'])
+    if (changes['tree']) {
+      this.onTreeDataChanges(changes['tree'])
     }
 
     if (changes['filter']) {
@@ -204,7 +199,7 @@ export class TreeComponent implements OnInit, OnChanges {
 
   onTreeDataChanges(changes: SimpleChange) {
     if (changes.isFirstChange()) {
-      this.tree = new Tree(changes.currentValue);
+      this.tree = changes.currentValue || new Tree();
     } else {
       let idWasExpanded = {};
       let idWasSelected = {};
@@ -212,8 +207,8 @@ export class TreeComponent implements OnInit, OnChanges {
       this.selectedNodes.forEach(node => idWasSelected[node.id] = true);
       this.expandedNodes = [];
       this.selectedNodes = [];
-      this.tree = new Tree(changes.currentValue);
-      this.tree.forEach(node => {
+      this.tree = changes.currentValue;
+      this.tree.root.forEach(node => {
         if (idWasExpanded[node.id]) this.expandNode(node);
         if (idWasSelected[node.id]) this.selectNode(node);
       });
@@ -227,6 +222,9 @@ export class TreeComponent implements OnInit, OnChanges {
         this.expandedNodes.push(node);
       }
       node.expand(true);
+      if (node.isAsync && !node.children.length) {
+        this.tree.loadChildrenAsync(node);
+      }
     }
   }
 

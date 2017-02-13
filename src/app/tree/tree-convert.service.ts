@@ -1,22 +1,24 @@
 import { Injectable } from '@angular/core';
-import { TreeNode }       from './node';
+import { Observable } from 'rxjs';
+import { TreeNode }   from './node';
+import { Tree }       from './tree';
 
 @Injectable()
 export class TreeConvertService {
-  makeTree(listData: Array<any>, parentKey?: string, primaryKey?: string):  TreeNode[] {
-    parentKey = parentKey || 'parentId';
-    primaryKey = primaryKey || 'id';
-    var data = listData.map(node => new TreeNode(node, node[primaryKey]));
-    var tree: TreeNode[] = [];
-    var rootIds: number[] = [];
-    var treeObjs = {};
-    var parent: TreeNode;
+  public makeTreeFromArray(listData: Array<any>,
+    parentKey='parentId',
+    primaryKey='id'):  Tree {
+
+    let data = listData.map(node => new TreeNode(node, node[primaryKey]));
+    let tree: TreeNode[] = [];
+    let rootIds: number[] = [];
+    let treeObjs = {};
+    let parent: TreeNode;
     data.forEach(node => { treeObjs[node.id] = node; });
     data.forEach(node => {
        let primary = node.data[primaryKey];
        let parentId = node.data[parentKey];
        treeObjs[primary] = node;
-       node.root = tree;
        if (parentId) {
          parent = treeObjs[parentId];
          node.parentNode = parent;
@@ -36,6 +38,59 @@ export class TreeConvertService {
     for (var i = 0; i < len; i++) {
        tree.push(treeObjs[rootIds[i]]);
     }
+    return new Tree(tree);
+  }
+
+  public makeTreeFromTree(treeData: Array<any>,
+    parent=null,
+    childKey='children',
+    primaryKey='id'): Tree {
+
+    return new Tree(this.traverseChildren(treeData));
+  }
+
+  public makeAsyncTree(rootData: Array<any>,
+    childFactory: (TreeNode) => Observable<any>,
+    primaryKey='id'): Tree {
+
+    let root: TreeNode[] = [];
+    rootData.forEach(node => {
+      let treeNode = new TreeNode(node, node[primaryKey])
+      treeNode.isAsync = true
+      root.push(treeNode);
+    });
+
+    let tree = new Tree(root);
+    tree.fetchChildren = (treeNode) => {
+      return childFactory(treeNode).map(child => {
+        let childNode = new TreeNode(child, child[primaryKey], treeNode)
+        childNode.isAsync = true
+        return childNode
+      })
+    }
     return tree;
+  }
+
+  private traverseChildren(treeData: Array<any>,
+    parent=null,
+    childKey='children',
+    primaryKey='id'): TreeNode[] {
+
+    let root: TreeNode[] = [];
+    treeData.forEach(node => {
+      let children = node[childKey];
+      if (!children) {
+        root.push(new TreeNode(node, node[primaryKey], parent));
+        return;
+      }
+
+      if (children instanceof Array) {
+        delete node[childKey];
+        let treeNode = new TreeNode(node, node[primaryKey], parent);
+        treeNode.children = this.traverseChildren(children, node, childKey, primaryKey);
+        root.push(treeNode);
+      }
+    });
+    return root;
   }
 }

@@ -8,8 +8,6 @@ import {
  * see https://github.com/gdi2290/es6-promise-loader for more info
  */
 
-console.log('`Detail` component loaded asynchronously');
-
 @Component({
   selector: 'detail',
   template: `

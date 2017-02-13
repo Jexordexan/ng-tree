@@ -1,4 +1,4 @@
-tree-root {
+tree {
   display: block;
 }
 
@@ -30,7 +30,7 @@ tree-root {
   display: none
 }
 .tree__node-item {
-  padding: 5px;
+  padding: 10px;
 }
 .tree__node-item:hover {
   background: rgba(128,128,128,.1);

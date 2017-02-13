@@ -6,8 +6,6 @@ import { RouterModule } from '@angular/router';
 import { routes } from './detail.routes';
 import { DetailComponent } from './detail.component';
 
-console.log('`Detail` bundle loaded asynchronously');
-
 @NgModule({
   declarations: [
     // Components / Directives/ Pipes

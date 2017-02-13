@@ -87,6 +87,8 @@ module.exports = function (options) {
 
       library: 'ac_[name]',
       libraryTarget: 'var',
+
+      publicPath: `http://localhost:${PORT}/dist/`
     },
 
     module: {
@@ -134,11 +136,9 @@ module.exports = function (options) {
       new DefinePlugin({
         'ENV': JSON.stringify(METADATA.ENV),
         'HMR': METADATA.HMR,
-        'process.env': {
-          'ENV': JSON.stringify(METADATA.ENV),
-          'NODE_ENV': JSON.stringify(METADATA.ENV),
-          'HMR': METADATA.HMR,
-        }
+        'process.env.ENV': JSON.stringify(METADATA.ENV),
+        'process.env.NODE_ENV': JSON.stringify(METADATA.ENV),
+        'process.env.HMR': METADATA.HMR
       }),
 
       new DllBundlesPlugin({
@@ -221,6 +221,7 @@ module.exports = function (options) {
       port: METADATA.port,
       host: METADATA.host,
       historyApiFallback: true,
+      publicPath: `http://localhost:${PORT}/dist/`,
       watchOptions: {
         aggregateTimeout: 300,
         poll: 1000
@@ -240,7 +241,12 @@ module.exports = function (options) {
       module: false,
       clearImmediate: false,
       setImmediate: false
-    }
+    },
+
+    /**
+     * https://github.com/chentsulin/webpack-target-electron-renderer#how-this-module-works
+     */
+    target: 'electron-renderer'
 
   });
 }

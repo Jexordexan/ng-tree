@@ -33,6 +33,7 @@
     "e2e:live": "npm-run-all -p -r server:prod:ci protractor:live",
     "e2e:travis": "npm-run-all -p -r server:prod:ci protractor:delay",
     "e2e": "npm-run-all -p -r server:prod:ci protractor",
+    "electron": "electron dist",
     "github-deploy:dev": "webpack --config config/webpack.github-deploy.js --progress --profile --env.githubDev",
     "github-deploy:prod": "webpack --config config/webpack.github-deploy.js --progress --profile --env.githubProd",
     "github-deploy": "npm run github-deploy:dev",
@@ -50,7 +51,7 @@
     "server:prod": "http-server dist -c-1 --cors",
     "server:prod:ci": "http-server dist -p 3000 -c-1 --cors",
     "server": "npm run server:dev",
-    "start:hmr": "npm run server:dev:hmr",
+    "start:hmr": "NODE_ENV=development npm run server:dev:hmr && npm run electron",
     "start": "npm run server:dev",
     "test": "npm run lint && karma start",
     "tslint": "tslint",
@@ -86,6 +87,7 @@
     "jasmine-core": "^2.5.2",
     "reflect-metadata": "^0.1.9",
     "rxjs": "~5.0.2",
+    "tslint-fix": "^0.1.0",
     "zone.js": "~0.7.4"
   },
   "devDependencies": {
@@ -104,6 +106,9 @@
     "codelyzer": "~2.0.0-beta.4",
     "copy-webpack-plugin": "^4.0.0",
     "css-loader": "^0.26.0",
+    "electron": "^1.4.15",
+    "electron-builder": "^11.4.4",
+    "electron-devtools-installer": "^2.0.1",
     "exports-loader": "^0.6.3",
     "expose-loader": "^0.7.1",
     "extract-text-webpack-plugin": "~2.0.0-beta.4",
@@ -157,6 +162,9 @@
   },
   "bugs": {
     "url": "https://github.com/angularclass/angular2-webpack-starter/issues"
+  },
+  "bin": {
+    "electron": "./node_modules/.bin/electron"
   },
   "engines": {
     "node": ">= 4.2.1",

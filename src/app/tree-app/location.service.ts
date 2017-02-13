@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Subject }    from 'rxjs/rx';
+import { Observable, Subject }    from 'rxjs/rx';
+import fs from 'fs';
+
 
 import { ILocation }  from './location';
 import { LOCATIONS }  from './mock-tree';
@@ -48,4 +50,9 @@ export class LocationService {
       clearInterval(this.locationInterval);
     }
   }
+
+  readDirectory(dir: string): Observable<any> {
+    return Observable.bindNodeCallback(fs.readdir)(dir).flatMap(arr => Observable.from(arr));
+  }
+
 }

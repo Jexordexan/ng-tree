@@ -1,4 +1,4 @@
-import { Component, Input, ElementRef, Renderer, OnChanges, TemplateRef} from '@angular/core';
+import { Component, Input, ElementRef, Renderer, OnChanges, TemplateRef } from '@angular/core';
 import { NgClass } from '@angular/common';
 
 import { TREE_EVENT, TreeEventsService } from './tree-events.service';
@@ -66,7 +66,9 @@ export class TreeNodeComponent {
       this.treeDragService.setTargetNode(this.treeNode, this.elem);
     }
 
-    let handleMove = (event: MouseEvent) => {
+    let start = this.treeDragService.pointerEventToXY(event);
+
+    let mouseMove = this.renderer.listenGlobal('document', 'mousemove', (event: MouseEvent) => {
       event.preventDefault();
 
       let threshold = 3;
@@ -79,19 +81,15 @@ export class TreeNodeComponent {
       } else {
         this.treeDragService.moveDrag(event);
       }
-    }
+    });
 
-    let handleEnd = (event: MouseEvent) => {
+    let mouseUp = this.renderer.listenGlobal('document', 'mouseup', (event: MouseEvent) => {
       mouseMove();
       mouseUp();
       if (this.treeDragService.getIsDragging()) {
         this.treeDragService.endDrag(event);
       }
-    }
-
-    let start = this.treeDragService.pointerEventToXY(event);
-    let mouseMove = this.renderer.listenGlobal('document', 'mousemove', handleMove);
-    let mouseUp = this.renderer.listenGlobal('document', 'mouseup', handleEnd);
+    });
   }
 
   onMouseClick(event: MouseEvent) {
@@ -120,6 +118,6 @@ export class TreeNodeComponent {
   }
 
   calculateIndent() {
-    return (this.treeNode.getDepth() * this.treeComponent.options.indentSize + 5) + "px";
+    return (this.treeNode.getDepth() * this.treeComponent.options.indentSize + 5) + 'px';
   }
 }

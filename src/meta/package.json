@@ -1,0 +1,14 @@
+{
+  "name": "electron-tree",
+  "productName": "electron-tree",
+  "version": "1.0.0",
+  "description": "Electron application for trees based on Angular 2 for rapid application development",
+  "main": "./electron.js",
+  "author": {
+    "name": "Jordan Simonds",
+    "email": "simonds.jordan@gmail.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+  }
+}

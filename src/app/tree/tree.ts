@@ -1,16 +1,25 @@
 import  * as _ from 'lodash';
+import { Observable } from 'rxjs';
+
 import { TreeNode } from './node';
 import { DropTarget } from './drop-target';
 
 export class Tree extends DropTarget {
   private nodesById: { [key: string]: TreeNode } = {};
   public root: TreeNode[] = [];
+  public fetchChildren: (TreeNode) => Observable<TreeNode>;
 
   constructor(treeData: TreeNode[] = []) {
     super();
     this.root = treeData;
     this.forEach(node => {
-      this.nodesById[node.id] = node;
+      if (this.nodesById[node.id]) {
+        throw new Error('Node already exists with id: ' + node.id)
+      } else {
+        node.tree = this
+        node.root = this.root
+        this.nodesById[node.id] = node;
+      }
     });
   }
 
@@ -40,19 +49,35 @@ export class Tree extends DropTarget {
     this.root.forEach(walk);
   }
 
+  loadChildrenAsync(node: TreeNode) {
+    node.isLoadingChildren = true;
+    this.fetchChildren(node).subscribe(
+      child => {
+        this.addNode(child, node);
+      },
+      err => {
+        node.isLoadingChildren = false;
+        console.error('Error fetching children')
+      },
+      () => {
+        node.isLoadingChildren = false;
+      }
+    )
+  }
+
   getNodeById(nodeId: number|string): TreeNode {
     return this.nodesById[nodeId];
   }
 
   getLastDescendant(node: TreeNode): TreeNode {
-    let last_child: TreeNode;
+    let lastChild: TreeNode;
     let n: number;
     n = node.children.length;
     if (n === 0) {
         return node;
     } else {
-        last_child = node.children[n - 1];
-        return this.getLastDescendant(last_child);
+        lastChild = node.children[n - 1];
+        return this.getLastDescendant(lastChild);
     }
   }
 
@@ -162,6 +187,7 @@ export class Tree extends DropTarget {
       }
       node.parentNode = parentNode;
     }
+    node.tree = this
     node.root = this.root
   }
 

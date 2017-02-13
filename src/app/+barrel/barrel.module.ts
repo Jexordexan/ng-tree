@@ -6,8 +6,6 @@ import { RouterModule } from '@angular/router';
 import { routes } from './barrel.routes';
 import { BarrelComponent } from './barrel.component';
 
-console.log('`Barrel` bundle loaded asynchronously');
-
 @NgModule({
   declarations: [
     // Components / Directives/ Pipes
