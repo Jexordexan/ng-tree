@@ -28,6 +28,8 @@
     "clean:dist": "npm run rimraf -- dist",
     "clean:install": "npm set progress=false && npm install",
     "clean": "npm cache clean && npm run rimraf -- node_modules doc coverage dist compiled dll",
+    "dev": "concurrently -k -n \"webpack,electron\" -p \"[{name}]\" \"npm run server:dev\" \"sleep 5 && npm run electron\"",
+    "dev:hmr": "concurrently -k -n \"webpack,electron\" -p \"[{name}]\" \"npm run server:dev:hmr\" \"sleep 5 && npm run electron\"",
     "docker": "docker",
     "docs": "npm run typedoc -- --options typedoc.json --exclude '**/*.spec.ts' ./src/",
     "e2e:live": "npm-run-all -p -r server:prod:ci protractor:live",
@@ -51,8 +53,8 @@
     "server:prod": "http-server dist -c-1 --cors",
     "server:prod:ci": "http-server dist -p 3000 -c-1 --cors",
     "server": "npm run server:dev",
-    "start:hmr": "NODE_ENV=development npm run server:dev:hmr && npm run electron",
-    "start": "npm run server:dev",
+    "start:hmr": "NODE_ENV=development npm run dev:hmr",
+    "start": "NODE_ENV=development npm run dev",
     "test": "npm run lint && karma start",
     "tslint": "tslint",
     "typedoc": "typedoc",
@@ -104,6 +106,7 @@
     "assets-webpack-plugin": "^3.4.0",
     "awesome-typescript-loader": "~3.0.0-beta.18",
     "codelyzer": "~2.0.0-beta.4",
+    "concurrently": "^3.3.0",
     "copy-webpack-plugin": "^4.0.0",
     "css-loader": "^0.26.0",
     "electron": "^1.4.15",
@@ -164,7 +167,8 @@
     "url": "https://github.com/angularclass/angular2-webpack-starter/issues"
   },
   "bin": {
-    "electron": "./node_modules/.bin/electron"
+    "electron": "./node_modules/.bin/electron",
+    "concurrently": "./node_modules/.bin/concurrently"
   },
   "engines": {
     "node": ">= 4.2.1",

@@ -5,7 +5,7 @@ import { LocationService } from './location.service';
 import { DragInfo } from '../tree/tree-drag.service';
 import { TreeEventsService, TREE_EVENT, TreeConvertService,
          TreeComponent, TreeNode, Tree } from '../tree';
-// enableProdMode();
+enableProdMode();
 
 @Component({
     selector: 'my-app',
