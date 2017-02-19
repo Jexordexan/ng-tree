@@ -2,8 +2,7 @@ import { Component, ElementRef, Input, Output, OnInit, OnChanges, Renderer, Even
 import  * as _ from 'lodash';
 import { Tree } from './tree';
 import { TreeNode } from './node';
-import { TreeNodeComponent } from './tree-node.component';
-import { ITreeNodeTemplate } from './node-content.component';
+import { TreeNodeComponent, ITreeNodeTemplate } from './tree-node.component';
 import { TreeDragService, DragInfo } from './tree-drag.service';
 import { TreeHandleDirective } from './tree-handle.directive';
 import { TreeEventsService, TREE_EVENT } from './tree-events.service';
@@ -30,7 +29,7 @@ export interface IOptions {
 
 export class TreeComponent implements OnInit, OnChanges {
   @Input() tree: Tree = new Tree();
-  @Input() filter: string = '';
+  // @Input() filter: string = '';
   @Input() options: IOptions;
   @ContentChild('nodeTemplate') nodeTemplate: TemplateRef<ITreeNodeTemplate>;
 
@@ -135,10 +134,6 @@ export class TreeComponent implements OnInit, OnChanges {
     if (changes['tree']) {
       this.onTreeDataChanges(changes['tree'])
     }
-
-    if (changes['filter']) {
-      this.onFilterChanges(changes['filter']);
-    }
   }
 
   onMouseOver(event: MouseEvent) {
@@ -167,51 +162,48 @@ export class TreeComponent implements OnInit, OnChanges {
     return true;
   }
 
-  onFilterChanges(changes: SimpleChange) {
-    this.filterTree(changes.currentValue);
+  filterNode(node: TreeNode, filter: (node: TreeNode) => boolean): boolean {
+    let isMatch = filter(node);
+    let hasMatch = false;
+    let children = node.children || [];
+    children.forEach(node => {
+      hasMatch = this.filterNode(node, filter) || hasMatch;
+    });
+
+    if (isMatch || hasMatch) {
+      node.show().expand().isMatch = isMatch;
+      return true;
+    } else {
+      node.hide().isMatch = false;
+      return false;
+    }
   }
 
-  filterTree(filter: string) {
-    let filterNode = (node: TreeNode, filter: string): boolean => {
-      let isMatch = node.data.Name.toLocaleLowerCase().indexOf(filter) !== -1;
-      let hasMatch = false;
+  filterTree(filter: (node: TreeNode) => boolean) {
+    this.tree.root.forEach(node => this.filterNode(node, filter));
+  }
+
+  clearFilter() {
+    const clearFilter = node => {
       let children = node.children || [];
-      children.forEach(node => {
-        hasMatch = filterNode(node, filter) || hasMatch;
-      });
-
-      if (!filter) {
-        node.show().isMatch = false;
-        node.expand(this.isExpanded(node));
-        return false;
-      } else if (isMatch || hasMatch) {
-        node.show().expand().isMatch = isMatch;
-        return true;
-      } else {
-        node.hide().isMatch = false;
-        return false;
-      }
+      children.forEach(clearFilter);
+      node.show().isMatch = false;
+      node.expand(this.isExpanded(node));
     }
-
-    filter = filter.toLocaleLowerCase();
-    this.tree.root.forEach(node => filterNode(node, filter));
+    this.tree.root.forEach(clearFilter);
   }
 
   onTreeDataChanges(changes: SimpleChange) {
     if (changes.isFirstChange()) {
       this.tree = changes.currentValue || new Tree();
     } else {
-      let idWasExpanded = {};
-      let idWasSelected = {};
-      this.expandedNodes.forEach(node => idWasExpanded[node.id] = true);
-      this.selectedNodes.forEach(node => idWasSelected[node.id] = true);
+      let expandedIds = this.expandedNodes.map(node => node.id);
+      let selectedIds = this.selectedNodes.map(node => node.id);
       this.expandedNodes = [];
       this.selectedNodes = [];
       this.tree = changes.currentValue;
-      this.tree.root.forEach(node => {
-        if (idWasExpanded[node.id]) this.expandNode(node);
-        if (idWasSelected[node.id]) this.selectNode(node);
-      });
+      expandedIds.forEach(id => this.expandNode(this.tree.getNodeById(id)))
+      selectedIds.forEach(id => this.selectNode(this.tree.getNodeById(id)))
     }
   }
 
@@ -222,8 +214,8 @@ export class TreeComponent implements OnInit, OnChanges {
         this.expandedNodes.push(node);
       }
       node.expand(true);
-      if (node.isAsync && !node.children.length) {
-        this.tree.loadChildrenAsync(node);
+      if (node.isAsync) {
+        this.tree.loadChildrenAsync(node, this.tree.loadDepth);
       }
     }
   }
@@ -318,9 +310,9 @@ export class TreeComponent implements OnInit, OnChanges {
   resolveSelection(nodes?: TreeNode[]) {
     let tree = this;
     nodes = nodes || this.selectedNodes;
-    nodes.sort((a, b) => {
-      return this.tree.isBeforeNode(a, b) ? -1 : 1;
-    });
+    // nodes.sort((a, b) => {
+    //   return this.tree.isBeforeNode(a, b) ? -1 : 1;
+    // });
     nodes.forEach(resolve);
     function resolve(node: TreeNode) {
       let children = node.children,

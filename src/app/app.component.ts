@@ -20,9 +20,6 @@ import { AppState } from './app.service';
   ],
   template: `
     <nav>
-      <a [routerLink]=" ['./'] " routerLinkActive="active">
-        Index
-      </a>
       <a [routerLink]=" ['./home'] " routerLinkActive="active">
         Home
       </a>
@@ -35,7 +32,7 @@ import { AppState } from './app.service';
       <a [routerLink]=" ['./about'] " routerLinkActive="active">
         About
       </a>
-      <a [routerLink]=" ['./tree-view'] " routerLinkActive="active">
+      <a [routerLink]=" ['./tree'] " routerLinkActive="active">
         Tree
       </a>
     </nav>
@@ -44,19 +41,12 @@ import { AppState } from './app.service';
       <router-outlet></router-outlet>
     </main>
 
-    <pre class="app-state">this.appState.state = {{ appState.state | json }}</pre>
-
     <footer>
       <span>WebPack Angular 2 Starter by <a [href]="url">@AngularClass</a></span>
-      <div>
-        <a [href]="url">
-          <img [src]="angularclassLogo" width="25%">
-        </a>
-      </div>
     </footer>
   `
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   public angularclassLogo = 'assets/img/angularclass-avatar.png';
   public name = 'Angular 2 Webpack Starter';
   public url = 'https://twitter.com/AngularClass';
@@ -64,11 +54,6 @@ export class AppComponent implements OnInit {
   constructor(
     public appState: AppState
   ) {}
-
-  public ngOnInit() {
-    console.log('Initial App State', this.appState.state);
-  }
-
 }
 
 /*

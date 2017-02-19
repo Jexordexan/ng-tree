@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { TreeComponent }  from './tree.component';
 import { TreeNodeComponent }  from './tree-node.component';
-import { TreeNodeContent }  from './node-content.component';
 
 import { TreeHandleDirective }  from './tree-handle.directive';
 
@@ -21,7 +20,6 @@ import 'styles/tree.css';
   declarations: [
     TreeComponent,
     TreeNodeComponent,
-    TreeNodeContent,
     TreeHandleDirective
   ],
   exports: [

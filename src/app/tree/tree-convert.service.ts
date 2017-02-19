@@ -51,7 +51,8 @@ export class TreeConvertService {
 
   public makeAsyncTree(rootData: Array<any>,
     childFactory: (TreeNode) => Observable<any>,
-    primaryKey='id'): Tree {
+    primaryKey='id',
+    loadDepth=1): Tree {
 
     let root: TreeNode[] = [];
     rootData.forEach(node => {
@@ -61,6 +62,7 @@ export class TreeConvertService {
     });
 
     let tree = new Tree(root);
+    tree.loadDepth = loadDepth;
     tree.fetchChildren = (treeNode) => {
       return childFactory(treeNode).map(child => {
         let childNode = new TreeNode(child, child[primaryKey], treeNode)
@@ -68,6 +70,9 @@ export class TreeConvertService {
         return childNode
       })
     }
+
+    tree.forEach(tree.loadChildrenAsync.bind(tree))
+
     return tree;
   }
 

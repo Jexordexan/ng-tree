@@ -4,7 +4,7 @@ describe('Tree Node', () => {
   let node: TreeNode
   let location = {
     id: 1,
-    Name: "United States of America"
+    Name: 'United States of America'
   }
 
   beforeEach( () => {

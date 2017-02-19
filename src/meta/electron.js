@@ -13,7 +13,7 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
 
   // Initialize the window to our specified dimensions
-  mainWindow = new BrowserWindow({ width: 1200, height: 900 });
+  mainWindow = new BrowserWindow({ width: 900, height: 900, titleBarStyle: 'hidden-inset' });
 
   // Tell Electron where to load the entry point from
   mainWindow.loadURL('file://' + __dirname + '/index.html');

@@ -10,12 +10,12 @@ tree {
   height: 17px;
 }
 
-.tree__icon.collapsed,
-.tree__icon.expanded {
+.hasChildren .tree__icon.collapsed,
+.hasChildren .tree__icon.expanded {
   background-image: url('data:image/svg+xml;utf8,<svg version="1.1" width="17" height="17" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M7 5 L13 10 L7 15" fill="none" stroke="black" stroke-width="2"/></svg>');
   transition: transform .2s;
 }
-.tree__icon.expanded {
+.hasChildren .tree__icon.expanded {
   transform: rotate(90deg);
 }
 .tree__nodes {

@@ -4,5 +4,6 @@ html, body{
 }
 
 a.active {
-  background-color: gray;
+  color: #29f;
+  border-color: #29f;
 }

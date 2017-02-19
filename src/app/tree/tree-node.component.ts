@@ -4,8 +4,12 @@ import { NgClass } from '@angular/common';
 import { TREE_EVENT, TreeEventsService } from './tree-events.service';
 import { TreeDragService } from './tree-drag.service';
 import { TreeComponent } from './tree.component';
-import { ITreeNodeTemplate } from './node-content.component';
 import { TreeNode } from './node';
+
+export interface ITreeNodeTemplate {
+  node: TreeNode;
+  context: any;
+}
 
 @Component({
     selector: 'tree-node',
@@ -16,11 +20,13 @@ import { TreeNode } from './node';
           [class.match]="treeNode.isMatch"
           [class.selected]="treeNode.isSelected"
           [class.placeInside]="treeNode.isDropTarget"
+          [class.hasChildren]="treeNode.children.length"
           [style.paddingLeft]="calculateIndent()"
           (mouseover)="onMouseOver($event)"
           (click)="onMouseClick($event)">
           <span class="tree__icon"
-                [ngClass]="treeNode.getState()"
+                [class.expanded]="treeNode.isExpanded"
+                [class.collapsed]="!treeNode.isExpanded"
                 (mousedown)="toggleExpand($event)"></span>
           <template [ngTemplateOutlet]="nodeTemplate" [ngOutletContext]="{ $implicit: treeNode }"></template>
       </div>

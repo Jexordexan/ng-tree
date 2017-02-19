@@ -2,18 +2,17 @@ import { Component, OnInit, ViewChild, enableProdMode } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { LocationService } from './location.service';
-import { DragInfo } from '../tree/tree-drag.service';
 import { TreeEventsService, TREE_EVENT, TreeConvertService,
-         TreeComponent, TreeNode, Tree } from '../tree';
+         TreeComponent, TreeNode, Tree, FilterMap, DragInfo } from '../tree';
 enableProdMode();
 
 @Component({
     selector: 'my-app',
     template: `
-    <input name="treeFilter" #treeFilter (keyup)="0" type="text" />
-    <tree [tree]="tree" [options]="treeOptions" [filter]="treeFilter.value">
+    <input name="treeFilter" #treeFilter (input)="filterTree(treeFilter.value)" type="text" />
+    <tree [tree]="tree" [options]="treeOptions">
       <template #nodeTemplate let-node>
-        <span>{{node.data.Name}}</span><small *ngIf="node.isLoadingChildren">Loading</small>
+        <span>{{node.data.name}}</span><small *ngIf="node.isLoadingChildren">Loading</small>
       </template>
     </tree>
     <button (click)="reloadData()">Reload data</button>
@@ -34,43 +33,29 @@ export class TreeAppComponent implements OnInit {
 
   public rawData: any;
   public tree: Tree;
+  public filter: FilterMap;
   public treeOptions = {
     allowDrag: true,
     allowDrop: true,
-    indentSize: 40
+    indentSize: 20
   }
   constructor (
     private locationService: LocationService,
     private treeConvertService: TreeConvertService,
     private treeEvents: TreeEventsService) {}
+    public getChildrenData: (node: TreeNode) => Observable<any>;
   ngOnInit() {
-    // let locationStream = this.locationService.getLocationObservable();
-    // locationStream.subscribe(data => {
-    //   this.rawData = data;
-    //   this.treeData = this.treeConvertService.makeTree(data);
-    // })
+    let dir$ = this.locationService.readDirectory('.').toArray();
 
-    let dir$ = this.locationService.readDirectory('.')
-      .map(item => ({ id: item, Name: item }))
-      .toArray();
+    this.getChildrenData = (node: TreeNode) => {
+      let path = node.id.toString();
+      return this.locationService.readDirectory(path);
+    }
 
     dir$.subscribe(
       result => {
         this.rawData = result;
-        this.tree = this.treeConvertService.makeAsyncTree(result, node => {
-          var path = './';
-          var parent = node.parentNode;
-          var parents = [];
-          while (parent) {
-            parents.push(parent.id)
-            parent = parent.parentNode;
-          }
-          parents.reverse().forEach(parent => path += parent + '/')
-          path += node.id
-          return this.locationService
-            .readDirectory(path)
-            .map(item => ({ id: item, Name: item }))
-        });
+        this.tree = this.treeConvertService.makeAsyncTree(result, this.getChildrenData, 'path');
       },
       err => {
         console.error(err);
@@ -84,6 +69,7 @@ export class TreeAppComponent implements OnInit {
       let re = /es/;
       if (target instanceof TreeNode) {
         if (drag.placeInside && target.data.allowDrop === false) {
+          console.log('rejected');
           drag.reject();
         }
       }
@@ -96,6 +82,16 @@ export class TreeAppComponent implements OnInit {
   };
 
   reloadData() {
-    this.tree = this.treeConvertService.makeTreeFromArray(this.rawData);
+    this.tree = this.treeConvertService.makeAsyncTree(this.rawData, this.getChildrenData, 'path');
+  }
+
+  filterTree(val) {
+    if (val) {
+      this.treeComponent.filterTree(node => {
+        return node.data.name.indexOf(val) > -1;
+      });
+    } else {
+      this.treeComponent.clearFilter();
+    }
   }
 }

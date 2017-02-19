@@ -18,6 +18,7 @@ export class TreeNode extends DropTarget {
   isSelected: boolean = false
   isMatch: boolean = false
   isLoadingChildren: boolean = false
+  hasLoadedChildren: boolean = false
   isLeafNode: boolean = false
   isVisible: boolean = true
 
@@ -47,12 +48,6 @@ export class TreeNode extends DropTarget {
       this.isSelected = setter
     }
     return this
-  }
-  getState() {
-    return {
-      expanded: this.children.length && this.isExpanded,
-      collapsed: this.children.length && !this.isExpanded
-    }
   }
   hasChildren(): boolean {
     if (this.isAsync) {

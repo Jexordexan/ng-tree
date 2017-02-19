@@ -8,6 +8,7 @@ export class Tree extends DropTarget {
   private nodesById: { [key: string]: TreeNode } = {};
   public root: TreeNode[] = [];
   public fetchChildren: (TreeNode) => Observable<TreeNode>;
+  public loadDepth: number;
 
   constructor(treeData: TreeNode[] = []) {
     super();
@@ -16,8 +17,8 @@ export class Tree extends DropTarget {
       if (this.nodesById[node.id]) {
         throw new Error('Node already exists with id: ' + node.id)
       } else {
-        node.tree = this
-        node.root = this.root
+        node.tree = this;
+        node.root = this.root;
         this.nodesById[node.id] = node;
       }
     });
@@ -31,7 +32,7 @@ export class Tree extends DropTarget {
     return node.root === this.root;
   }
 
-  forEach(beforeFn?: (node: TreeNode) => void, afterFn?: (node: TreeNode) => void) {
+  forEach(beforeFn?: (node: TreeNode) => void, afterFn?: (node: TreeNode) => void, entryNode?: TreeNode) {
     function walk(node: TreeNode): void {
       if (node) {
         if (beforeFn && typeof beforeFn === 'function') {
@@ -46,23 +47,34 @@ export class Tree extends DropTarget {
       }
     }
 
-    this.root.forEach(walk);
+    if (entryNode) {
+      walk(entryNode);
+    } else {
+      this.root.forEach(walk);
+    }
   }
 
-  loadChildrenAsync(node: TreeNode) {
-    node.isLoadingChildren = true;
-    this.fetchChildren(node).subscribe(
-      child => {
-        this.addNode(child, node);
-      },
-      err => {
-        node.isLoadingChildren = false;
-        console.error('Error fetching children')
-      },
-      () => {
-        node.isLoadingChildren = false;
-      }
-    )
+  loadChildrenAsync(node: TreeNode, depth=this.loadDepth) {
+    if (depth < 0) {
+      return;
+    } else if (node.hasLoadedChildren) {
+      node.children.forEach(child => {
+        this.loadChildrenAsync(child, depth - 1);
+      })
+    } else {
+      node.isLoadingChildren = true;
+      this.fetchChildren(node).subscribe(
+        child => {
+          this.addNode(child, node);
+          this.loadChildrenAsync(child, depth - 1);
+        }, err => {
+          node.isLoadingChildren = false;
+          console.error('Error fetching children', err);
+        }, () => {
+          node.isLoadingChildren = false;
+          node.hasLoadedChildren = true;
+        });
+    }
   }
 
   getNodeById(nodeId: number|string): TreeNode {
@@ -174,6 +186,10 @@ export class Tree extends DropTarget {
   }
 
   addNode(node: TreeNode, parentNode: TreeNode, index: number = 0) {
+    if (this.nodesById[node.id]) {
+      throw new Error('Node already exists with id: ' + node.id)
+    }
+
     this.nodesById[node.id] = node;
 
     if (parentNode === null) {

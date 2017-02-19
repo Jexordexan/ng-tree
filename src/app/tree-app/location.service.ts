@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject }    from 'rxjs/rx';
-import fs from 'fs';
+import * as fs from 'fs';
+import * as path from 'path';
 
 
 import { ILocation }  from './location';
@@ -52,7 +53,26 @@ export class LocationService {
   }
 
   readDirectory(dir: string): Observable<any> {
-    return Observable.bindNodeCallback(fs.readdir)(dir).flatMap(arr => Observable.from(arr));
+    // console.log(dir);
+    if (!fs.statSync(dir).isDirectory()) {
+      return Observable.from([]);
+    }
+
+    if (!dir.endsWith('/')) {
+      dir += '/'
+    }
+
+    return Observable
+      .bindNodeCallback(fs.readdir)(dir)
+      .flatMap(arr => Observable.from(arr))
+      .map(name => {
+        let filePath = dir + name;
+        return {path: filePath, name: name};
+      })
+  }
+
+  readStats(dir: string): Observable<any> {
+    return Observable.bindNodeCallback(fs.stat)(dir);
   }
 
 }

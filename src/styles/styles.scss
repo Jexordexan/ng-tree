@@ -2,19 +2,25 @@
 /* This file is for setting global styles  */
 @import 'variables';
 
-nav {
-  margin-top: 16px;
-}
 
-nav a {
-  background-color: $nav-button-color;
-  display: inline-block;
-  color: white;
-  padding: 8px 16px;
-  margin: 8px;
-  vertical-align: middle;
-  line-height: 1.25;
-  text-align: center;
-  text-decoration: none;
-  border-radius: 4px;
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-left: 100px;
+  background: $nav-background;
+  -webkit-app-region: drag;
+
+  a {
+    -webkit-app-region: no-drag;
+    display: inline-block;
+    color: #666;
+    padding: 8px 10px;
+    vertical-align: middle;
+    line-height: 1.25;
+    text-align: center;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+  }
 }

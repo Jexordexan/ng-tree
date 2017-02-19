@@ -19,6 +19,7 @@ h2, h3 {
 
 body {
   margin: 2em;
+  margin-top: 5em;
 }
 
 input[text], button {
