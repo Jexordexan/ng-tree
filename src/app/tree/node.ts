@@ -31,15 +31,15 @@ export class TreeNode extends DropTarget {
 
   show() {
     this.isVisible = true
-    return this
+    return this;
   }
   hide() {
     this.isVisible = false
-    return this
+    return this;
   }
   expand(setter: boolean = true) {
     this.isExpanded = setter
-    return this
+    return this;
   }
   select(setter?: boolean) {
     if (setter === undefined) {
@@ -47,7 +47,7 @@ export class TreeNode extends DropTarget {
     } else {
       this.isSelected = setter
     }
-    return this
+    return this;
   }
   hasChildren(): boolean {
     if (this.isAsync) {

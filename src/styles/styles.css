@@ -20,6 +20,7 @@ h2, h3 {
 body {
   margin: 2em;
   margin-top: 5em;
+  min-width: 420px;
 }
 
 input[text], button {
@@ -47,7 +48,6 @@ button:active {
 
 a {
   cursor: pointer;
-  cursor: hand;
 }
 
 input[type=text] {
