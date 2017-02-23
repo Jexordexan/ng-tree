@@ -5,7 +5,7 @@ var mainWindow = null;
 
 function createWindow() {
   // Initialize the window to our specified dimensions
-  mainWindow = new BrowserWindow({ width: 900, height: 900, titleBarStyle: 'hidden-inset' });
+  mainWindow = new BrowserWindow({ width: 900, height: 900, titleBarStyle: 'hidden-inset', vibrancy: 'light'});
 
   // Tell Electron where to load the entry point from  
   mainWindow.loadURL('http://localhost:3000/dist/');

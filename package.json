@@ -52,7 +52,7 @@
     "server:dev": "webpack-dev-server --config config/webpack.dev.js --progress --profile --watch --content-base src/",
     "server:prod": "http-server dist -c-1 --cors",
     "server:prod:ci": "http-server dist -p 3000 -c-1 --cors",
-    "server": "npm run server:dev",
+    "server": "webpack-dashboard -- npm run server:dev",
     "start:hmr": "NODE_ENV=development npm run dev:hmr",
     "start": "NODE_ENV=development npm run dev",
     "test": "npm run lint && karma start",
